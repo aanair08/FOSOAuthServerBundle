@@ -44,7 +44,8 @@ class OAuthProvider implements AuthenticationProviderInterface
      * @var UserCheckerInterface
      */
     protected $userChecker;
-
+    /** CONSTANT FOR EMPTY USER*/
+    CONST USER='anon.';
     /**
      * @param UserProviderInterface $userProvider  the user provider
      * @param OAuth2                $serverService the OAuth2 server service
@@ -114,7 +115,12 @@ class OAuthProvider implements AuthenticationProviderInterface
 
                 $token->setUser($user);
             }
-
+            /** From symfony 5.4 user is mandatory for the token stroage interface
+             *  for the grand type client credentials no user is available
+             */
+            if (null == $token->getUser()) {
+                $token->setUser(self::USER);
+            }
             return $token;
         } catch (OAuth2ServerException $e) {
             throw new AuthenticationException('OAuth2 authentication failed', 0, $e);
